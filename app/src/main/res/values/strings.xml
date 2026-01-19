@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Weather Mini App</string>
-    <string name="title_activity_main_menu">MainMenu</string>
+    <string name="title_activity_main_menu">电云天气</string>
 </resources>
