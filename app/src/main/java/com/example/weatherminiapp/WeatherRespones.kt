@@ -10,7 +10,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 object WeatherRespones {
-    private var cityCode = "440300"
+    private val cityCode = "440300"
     private val gaodeKey = "6665cad90fa16cf8185db8890a632858"
     private val BASE_URL =
         "https://restapi.amap.com/v3/weather/weatherInfo"
@@ -19,7 +19,7 @@ object WeatherRespones {
     private val gson = Gson()
 
 
-    suspend fun getEveryWeekForcast(cityCode: String): Unit? =
+    suspend fun getEveryWeekForecast(cityCode: String): Forecast? =
         withContext(Dispatchers.IO) {
             try{
                 val requestUrl = "$BASE_URL?city=$cityCode&key=$gaodeKey&extensions=all"
@@ -30,12 +30,21 @@ object WeatherRespones {
 
 
                 // 如果成功发送请求
-                if (response.isSuccessful)
+                if (!response.isSuccessful)
                 {
-                    val jsonStr = response.body.toString()
-                    val weatherResp = gson.fromJson(jsonStr, WeatherData::class.java)
-                    weatherResp.forecast?.firstOrNull()
+                    println("okhttp请求失败 ${response.code}")
+                    return@withContext null
                 }
+                val jsonStr = response.body?.string() ?: return@withContext null
+                println(jsonStr)
+                val weatherResp = gson.fromJson(jsonStr, WeatherData::class.java)
+                println(weatherResp)
+
+                if (weatherResp.status != "1") {
+                    println("高德 API 错误状态: ${weatherResp.status} - ${weatherResp.forecasts}")
+                    return@withContext null
+                }
+                weatherResp.forecasts?.firstOrNull()
 
             }catch(e : Exception)
             {

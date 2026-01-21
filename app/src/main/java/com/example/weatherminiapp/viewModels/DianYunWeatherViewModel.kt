@@ -1,8 +1,10 @@
 package com.example.weatherminiapp.viewModels
 
 import androidx.lifecycle.ViewModel
-import com.example.weatherminiapp.repository.SettingRespoitory
+import androidx.lifecycle.viewModelScope
+import com.example.weatherminiapp.repository.LangSettingRepository
 import com.example.weatherminiapp.repository.UserRepository
+import kotlinx.coroutines.launch
 
 data class DianYunWeatherUiState(
     val selectedImageUri: String?
@@ -10,8 +12,14 @@ data class DianYunWeatherUiState(
 
 class DianYunWeatherViewModel(
     private val userRepository : UserRepository,
-    private val settingRespotory : SettingRespoitory
+    private val settingRespotory : LangSettingRepository
 ) : ViewModel(){
 
     val currentUser = userRepository.getUser()
+    val currentLanguage = settingRespotory.getLanguage()
+
+    fun setCurrentLanguage(nextLang : String)
+    {
+        viewModelScope.launch { settingRespotory.setLanguage(nextLang) }
+    }
 }

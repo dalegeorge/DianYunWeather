@@ -3,16 +3,20 @@ package com.example.weatherminiapp
 data class WeatherData(
     val status: String,
     val count: String,
-    val forecast: List<Forecast>
+    val info: String,
+    val infocode: String,
+    val forecasts: List<Forecast>?
 )
 
 data class Forecast(
     val city: String,
-    val cityCodes: String,
-    val casts: List<temperature>
+    val adcode: String,
+    val casts: List<Temperature>
 )
 
-data class temperature(
-    val tempFloat: String,
-    val weatherDescrp: String
+data class Temperature(
+    val week: String,
+    val dayweather: String,
+    val daytemp: String,
+    val nighttemp: String
 )
