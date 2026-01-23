@@ -16,7 +16,7 @@ data class Forecast(
 
 data class Temperature(
     val week: String,
-    val dayweather: String,
-    val daytemp: String,
-    val nighttemp: String
+    val dayweather: String?,
+    val daytemp: String?,
+    val nighttemp: String?
 )

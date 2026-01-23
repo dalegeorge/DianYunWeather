@@ -12,14 +12,8 @@ data class DianYunWeatherUiState(
 
 class DianYunWeatherViewModel(
     private val userRepository : UserRepository,
-    private val settingRespotory : LangSettingRepository
 ) : ViewModel(){
 
     val currentUser = userRepository.getUser()
-    val currentLanguage = settingRespotory.getLanguage()
 
-    fun setCurrentLanguage(nextLang : String)
-    {
-        viewModelScope.launch { settingRespotory.setLanguage(nextLang) }
-    }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Weather Mini App</string>
+    <string name="app_name">电云天气</string>
     <string name="title_activity_main_menu">电云天气</string>
     <string name="shanghai_cityCode">310000</string>
     <string name="shenzhen_cityCode">440300</string>

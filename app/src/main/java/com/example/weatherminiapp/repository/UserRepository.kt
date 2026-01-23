@@ -16,7 +16,7 @@ class UserRepository(private val userDao: UserDao ) {
 
     suspend fun logout()
     {
-        val currentUser = userDao.getAllUser().firstOrNull()
+        val currentUser = userDao.getAllUser().value
         if(currentUser != null)
         {
             userDao.updateUser(currentUser.copy(isLoggedIn = false))

@@ -1,5 +1,6 @@
 package com.example.weatherminiapp
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,7 +20,7 @@ object WeatherRespones {
     private val gson = Gson()
 
 
-    suspend fun getEveryWeekForecast(cityCode: String): Forecast? =
+    suspend fun getEveryWeekForecast(cityCode: String): List<Temperature>? =
         withContext(Dispatchers.IO) {
             try{
                 val requestUrl = "$BASE_URL?city=$cityCode&key=$gaodeKey&extensions=all"
@@ -35,6 +36,7 @@ object WeatherRespones {
                     println("okhttp请求失败 ${response.code}")
                     return@withContext null
                 }
+
                 val jsonStr = response.body?.string() ?: return@withContext null
                 println(jsonStr)
                 val weatherResp = gson.fromJson(jsonStr, WeatherData::class.java)
@@ -44,12 +46,21 @@ object WeatherRespones {
                     println("高德 API 错误状态: ${weatherResp.status} - ${weatherResp.forecasts}")
                     return@withContext null
                 }
-                weatherResp.forecasts?.firstOrNull()
+
+                val forecasts = weatherResp.forecasts
+
+                val forecast = forecasts?.firstOrNull()
+
+                val casts = forecast?.casts
+                // 获取5天的天气（包含今天）
+                val fiveDaysCast = casts?.take(5)
+                Log.d("WeatherService", "成功获取 ${fiveDaysCast?.size} 天预报数据")
+                fiveDaysCast
+//                weatherResp.forecasts?.firstOrNull()
 
             }catch(e : Exception)
             {
                 println(e.message)
-                e.printStackTrace()
                 null
             }
         }

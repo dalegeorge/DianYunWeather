@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -67,15 +67,15 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    // 应用SQLite数据库依赖
-    implementation(files("./sqlite-android-3510100.aar"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     // 应用OkHttp网络框架
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("com.google.code.gson:gson:2.10.1")
     // 应用Room数据库储存
-    implementation("androidx.room:room-runtime-android:2.8.4")
+    implementation("androidx.room:room-runtime:2.8.4")
     implementation("androidx.room:room-ktx:2.8.4")
-    findKaptConfiguration("androidx.room:room-compiler:2.8.4")
+//    findKaptConfiguration("androidx.room:room-compiler:2.6.1")
+    ksp("androidx.room:room-compiler:2.8.4")
     // 轻量级网络插件
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     // 应用coil图片库处理图片

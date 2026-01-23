@@ -10,14 +10,13 @@ import com.example.weatherminiapp.entities.LanguageSettings
 import com.example.weatherminiapp.entities.Users
 
 @Database(
-    entities = [Users::class, LanguageSettings::class],
+    entities = [Users::class],
     version = 1,
     exportSchema = false
 )
 abstract class BaseDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
 
-    abstract fun languageDao(): LanguageDao
 
     companion object {
         @Volatile
@@ -26,7 +25,7 @@ abstract class BaseDatabase: RoomDatabase() {
         fun getInstance(context : Context): BaseDatabase
         {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context, BaseDatabase::class.java,"weather_db").build()
+                val instance = Room.databaseBuilder(context.applicationContext, BaseDatabase::class.java,"weather_db").build()
                 INSTANCE = instance
                 instance
             }

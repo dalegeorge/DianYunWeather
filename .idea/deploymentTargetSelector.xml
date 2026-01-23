@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="dianXunWeather">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-01-20T13:28:11.715248500Z">
+        <DropdownSelection timestamp="2026-01-22T09:58:22.474264400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\DaleGuan_dg\.android\avd\Pixel_7_new.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\DaleGuan_dg\.android\avd\Pixel_7a.avd" />
             </handle>
           </Target>
         </DropdownSelection>
