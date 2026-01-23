@@ -1,5 +1,6 @@
 package com.example.weatherminiapp.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -49,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -66,6 +68,7 @@ import com.example.weatherminiapp.AppDestinations
 import com.example.weatherminiapp.Forecast
 import com.example.weatherminiapp.MenuSource
 import com.example.weatherminiapp.cityOptions.CityMenu
+import com.example.weatherminiapp.viewModels.UserLoginViewModel
 import com.example.weatherminiapp.viewModels.WeatherViewModel
 import kotlinx.coroutines.launch
 
@@ -88,26 +91,43 @@ class MainMenu : ComponentActivity() {
 fun WeatherMiniAppApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.WEATHER) }
     var currentCityCode by rememberSaveable { mutableStateOf("310000") }
-    var isUserLogin by rememberSaveable { mutableStateOf(false) }
+    var isUserLogin by rememberSaveable { mutableStateOf(true) }
     val weatherViewModel: WeatherViewModel = viewModel()
+//    val loginViewModel: UserLoginViewModel = viewModel()
+
     fun switchCity(newCity: String) {
         currentCityCode = newCity
         weatherViewModel.loadWeather(currentCityCode)
     }
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-
+            AppDestinations.entries.forEach { destinations ->
                 item(
                     icon = {
-                            Icon(painter = painterResource(R.drawable.sunny_24px),
-                                contentDescription = null)
+//                        Icon(painter = painterResource(R.drawable.sunny_24px),
+//                            contentDescription = null)
+                        when (val iconSource = destinations.icon)
+                        {
+                            is MenuSource.Vector -> {
+                                Icon(
+                                    imageVector = iconSource.imageVector,
+                                    contentDescription = destinations.label
+                                )
 
+                            }
+                            is MenuSource.Drawable -> {
+                                Icon(
+                                    painter = painterResource(iconSource.resId),
+                                    contentDescription = destinations.label
+                                )
+                            }
+                        }
                     },
-                    label = { Text(AppDestinations.WEATHER.label) },
-                    selected = currentDestination == AppDestinations.WEATHER,
-                    onClick = { currentDestination = AppDestinations.WEATHER }
+                    label = { Text(destinations.label) },
+                    selected = currentDestination == destinations,
+                    onClick = { currentDestination = destinations }
                 )
-
+            }
         }
     ) {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -125,21 +145,26 @@ fun WeatherMiniAppApp() {
                             "天气预报", maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                    }, navigationIcon = {
-                        IconButton(onClick = {
-                            Log.d("Login page","navigating to Login screen")
-                            currentDestination = AppDestinations.LOGIN
-                        })
-                        {
-                            Icon(
-                                imageVector = Icons.Filled.AccountBox,
-                                contentDescription = "menu icon"
+                    },
+//                    navigationIcon = {
+//                        IconButton(onClick = {
+//                            Log.d("Login page","navigating to Login screen")
+//                            currentDestination = AppDestinations.LOGIN
+//                        })
+//                        {
+//                            Icon(
+//                                imageVector = Icons.Filled.AccountBox,
+//                                contentDescription = "menu icon"
+//                            )
+//                        }
+//                    },
+                    actions = {
+                        if(isUserLogin) {
+                            CityMenu(
+                                currentCity = { newCityCode -> switchCity(newCityCode) },
+                                isUserLogin
                             )
                         }
-                    }, actions = {
-                        CityMenu(
-                            currentCity = { newCityCode -> switchCity(newCityCode) },isUserLogin
-                        )
                     }
                 )
             }
@@ -154,7 +179,10 @@ fun WeatherMiniAppApp() {
                 }
                 when (currentDestination) {
                     AppDestinations.WEATHER -> WeatherScreen(currentCityCode, weatherViewModel)
-                    AppDestinations.LOGIN -> LoginScreen()
+                    AppDestinations.LOGIN -> {
+                        val intent = Intent(LocalContext.current, LoginActivity::class.java)
+                        LocalContext.current.startActivity(intent)
+                    }
                 }
             }
         }

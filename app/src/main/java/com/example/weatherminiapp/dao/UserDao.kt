@@ -18,5 +18,11 @@ interface UserDao {
 
     @Query("SELECT * FROM user where id = 0 LIMIT 1")
     fun getAllUser() : LiveData<Users?>
+    @Query("SELECT * FROM user WHERE username = :username AND password = :password LIMIT 1")
+    suspend fun findUser(username: String, password: String): Users?
+
+    @Query("SELECT * FROM user WHERE isLoggedIn = 1 LIMIT 1")
+    suspend fun getLogginedUser(): Users?
+
 
 }

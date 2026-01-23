@@ -6,10 +6,10 @@ import androidx.compose.material.icons.filled.Home
 
 enum class AppDestinations(
     val label: String,
-//    val icon: MenuSource,
+    val icon: MenuSource,
 ) {
-    WEATHER("天气"),
+    WEATHER("天气",MenuSource.Drawable(R.drawable.sunny_24px)),
 //    LOGIN("登录", MenuSource.Vector Icons.Default.AccountBox)
-    LOGIN("登录")
+    LOGIN("登录", MenuSource.Vector(Icons.Default.AccountBox))
 }
 

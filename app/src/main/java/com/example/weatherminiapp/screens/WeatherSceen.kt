@@ -97,6 +97,7 @@ fun weatherCard(dayTemp: Temperature)
                 .padding(horizontal = 4.dp), // 轻微的水平边距
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,6 +106,7 @@ fun weatherCard(dayTemp: Temperature)
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+
                     Text(
                         "周${dayTemp.week}",
                         fontSize = 18.sp,

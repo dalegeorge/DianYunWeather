@@ -10,12 +10,13 @@ import com.example.weatherminiapp.viewModels.UserLoginViewModel
 
 class LoginVMFactory(private val userRepository: UserRepository): ViewModelProvider.Factory
 {
-    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UserLoginViewModel::class.java))
         {
-            @Suppress("UNCHECKED_CAST")
+
             return UserLoginViewModel(userRepository = userRepository) as T
         }
-        throw IllegalArgumentException("user viewmodel class is illegal")
+        throw IllegalArgumentException("user viewmodel class is unknown")
     }
 }

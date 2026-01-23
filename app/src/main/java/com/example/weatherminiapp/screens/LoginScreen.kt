@@ -34,13 +34,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.weatherminiapp.database.BaseDatabase
+import com.example.weatherminiapp.entities.Users
 import com.example.weatherminiapp.repository.UserRepository
 import com.example.weatherminiapp.ui.theme.WeatherMiniAppTheme
 import com.example.weatherminiapp.viewModelFactory.LoginVMFactory
@@ -55,47 +60,86 @@ class LoginActivity: ComponentActivity()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            WeatherMiniAppTheme {
-                LoginScreen()
-            }
-        }
-        val roomdb = BaseDatabase.getInstance(this)
+        val roomdb = BaseDatabase.getDatabase(this)
         val userRepo = UserRepository(roomdb.userDao())
         loginViewModel = ViewModelProvider(this, LoginVMFactory(userRepository = userRepo))[UserLoginViewModel::class.java]
 
-        loginViewModel.getUser().observe(this) { users ->  if (users != null && users.isLoggedIn) {
-            Toast.makeText(this, "登录成功: ${users.username}", Toast.LENGTH_SHORT).show()
+        loginViewModel.logginResult.observe(this) { loggined ->  if (loggined) {
+            Toast.makeText(this, "登录成功！", Toast.LENGTH_SHORT).show()
             // 登录成功，跳转到主页面
             val intent = Intent(this, MainMenu::class.java)
             startActivity(intent)
             finish()
+        }
+
+        else {
+            Toast.makeText(this, "登录失败,请重试", Toast.LENGTH_SHORT).show()
         }}
+        setContent {
+            WeatherMiniAppTheme {
+                LoginScreen(loginViewModel = loginViewModel)
+            }
+        }
+
 
     }
 }
 
-@PreviewScreenSizes
+//@PreviewScreenSizes
 @Composable
-fun LoginScreen()
+fun LoginScreen(loginViewModel : UserLoginViewModel)
 {
-    val usernames by rememberSaveable {mutableStateOf("") }
+    var usernames by rememberSaveable {mutableStateOf("") }
+    var passwords by rememberSaveable { mutableStateOf("")}
+    val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
+    val isloggined = currentUser?.isLoggedIn == true
         Scaffold(modifier = Modifier.fillMaxHeight(1f).fillMaxWidth(1f)) { innerPadding ->
         Column(Modifier
             .fillMaxSize(1f).padding(innerPadding)) {
-            Spacer(Modifier.height(165.dp).fillMaxWidth(1f))
+            Spacer(Modifier.height(65.dp).fillMaxWidth(1f))
             Column(
                 modifier = Modifier
-                    .fillMaxSize(1f), Arrangement.Center,Alignment.CenterHorizontally
+                    .fillMaxSize(1f), Arrangement.Top,Alignment.CenterHorizontally
             ) {
+                if (isloggined){
+                    Text("欢迎回来,${currentUser?.username}!", fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(220.dp), maxLines = 1)
+                }
+                else {
+                    Text("请登录用户", fontSize = 17.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp), maxLines = 1)
 
-                Button(onClick = {}, Modifier.height(50.dp).width(100.dp)) {
-                    Text("登录")
                 }
+                Spacer(Modifier.height(44.dp).fillMaxWidth(1f))
+                Text("用户名:",fontSize = 15.sp)
+                TextField(value = usernames,
+                    onValueChange = {
+                        usernames = it
+                    }, modifier = Modifier.height(55.dp),enabled = !isloggined
+                )
                 Spacer(Modifier.height(15.dp).fillMaxWidth(1f))
-                Button(onClick = {},Modifier.height(50.dp).width(100.dp)){
-                    Text("登出")
+                Text("密码:",fontSize = 15.sp)
+                TextField(value = passwords,
+                    onValueChange = {
+                        passwords = it
+                    }, modifier = Modifier.height(55.dp), enabled = !isloggined
+                    )
+                Spacer(Modifier.height(25.dp).fillMaxWidth(1f))
+                if(!isloggined)
+                {
+                    Button(onClick = {
+                        loginViewModel.userLogin(username = usernames, password = passwords)
+                    }, Modifier.height(50.dp).width(130.dp)) {
+                        Text("注册/登录")
+                    }
                 }
+                else
+                {
+                    Button(onClick = {
+                        loginViewModel.logout(currentUser!!.username)
+                    },Modifier.height(50.dp).width(130.dp)){
+                        Text("登出")
+                    }
+                }
+
             }
         }
         }
@@ -115,6 +159,12 @@ fun LoginCard()
 fun LoginPreview()
 {
     WeatherMiniAppTheme() {
-        LoginScreen()
+        val mockRepo = object : UserRepository(null!!) {
+         suspend fun validateAndLogin(username: String, password: String): Boolean = true
+          override  suspend fun logout(currentUsername: String) {}
+            suspend fun getCurrentLoggedInUser(): Users? = null
+        }
+        val mockViewModel = UserLoginViewModel(mockRepo)
+        LoginScreen(loginViewModel = mockViewModel)
     }
 }

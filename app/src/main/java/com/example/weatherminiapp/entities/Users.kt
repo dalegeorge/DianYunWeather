@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Users(
     @PrimaryKey val id: Int = 0,
     val username: String,
+    val password: String,
     val isLoggedIn: Boolean
 )
